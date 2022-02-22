@@ -30,12 +30,12 @@ defmodule Herd.Supervisor do
 
         children = [
           # needs to be started FIRST
-          worker(Registry, [[name: Module.concat(@pool, Registry), keys: :unique]]),
-          supervisor(@pool, [options]),
-          worker(@cluster, [options]),
+          {Registry, keys: :unique, name: Module.concat(@pool, Registry)},
+          {@pool, [options]},
+          {@cluster, [options]}
         ]
 
-        supervise(children, opts)
+        Supervisor.init(children, strategy: :one_for_one)
       end
 
       def supervisor_config(), do: Application.get_env(@otp, __MODULE__, [])
